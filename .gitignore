@@ -1,5 +1,5 @@
 *
-!.emacs
+!init.el
 !.gitignore
 !README.org
 
