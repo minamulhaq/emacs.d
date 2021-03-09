@@ -130,7 +130,22 @@
 
 (use-package mode-icons
 			 :ensure t
-			 :init (mode-icons-mode))
+			 :init (mode-icons-mode)
+             :config
+             (progn
+               (setq doom-modeline-height 10)
+               (setq doom-modeline-project-detection 'projectile)
+               (setq doom-modeline-buffer-file-name-style 'file-name)
+               (setq doom-modeline-icon (display-graphic-p))
+               (setq doom-modeline-major-mode-icon t)
+               (setq doom-modeline-major-mode-color-icon t)
+               (setq doom-modeline-buffer-state-icon t)
+               (setq doom-modeline-buffer-modification-icon t)
+               (setq doom-modeline-indent-info nil)
+               (setq doom-modeline-modal-icon 'evil)
+               (setq doom-modeline-env-version t)
+                )
+               )
 
 ; (use-package nlinum-hl
 ; 			 :ensure t)
@@ -241,7 +256,10 @@
 			 :config
 			 (evil-collection-init))
 
-
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -916,7 +934,8 @@
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
  '(package-selected-packages
-   '(vterm-toggle lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   (quote
+    (undo-tree rainbow-delimiters evil-collection vterm-toggle lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
 
 
 
