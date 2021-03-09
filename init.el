@@ -202,13 +202,16 @@
   (add-to-list 'evil-emacs-state-modes mode)))
 
 
-
-;; Enable Evil
+; Enable Evil
 (use-package evil
 			 :ensure t
 			 :init
-			 (setq evil-want-C-u-scroll t)
 			 (setq evil-want-keybinding nil)
+             (setq evil-want-C-u-scroll t)
+             (setq evil-move-beyond-eol t)
+             (setq evil-cross-lines t)
+             (setq evil-undo-system 'undo-tree)
+             (setq evil-respect-visual-line-mode t)
 			 (evil-mode 1)
 			 :config
 			 (progn
@@ -216,7 +219,7 @@
 			   (evil-set-initial-state 'messages-buffer-mode 'normal)
 			   (evil-set-initial-state 'dashboard-mode 'normal)
 			   (when evil-want-C-u-scroll
-				 (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
+                 (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
 				 (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
 				 (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
 				 (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up))
@@ -255,6 +258,13 @@
 			 :after evil
 			 :config
 			 (evil-collection-init))
+
+
+(use-package evil-surround
+  :ensure t
+  :config
+    (global-evil-surround-mode 1))
+
 
 (use-package undo-tree
   :init
@@ -935,7 +945,7 @@
  '(helm-minibuffer-history-key "M-p")
  '(package-selected-packages
    (quote
-    (undo-tree rainbow-delimiters evil-collection vterm-toggle lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
+    (evil-surround undo-tree rainbow-delimiters evil-collection vterm-toggle lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
 
 
 
@@ -950,3 +960,6 @@
         (ansi-term (getenv "SHELL"))
         (setq show-trailing-whitespace nil)))))
 (global-set-key (kbd "<f12>") 'toggle-term)
+
+
+
