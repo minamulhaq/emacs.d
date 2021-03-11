@@ -207,7 +207,8 @@
       :ensure t
       :commands (evil-leader-mode)
       :init
-		(global-evil-leader-mode)
+      (setq evil-want-keybinding nil)
+      (global-evil-leader-mode)
       :config
       (progn
 		(evil-leader/set-leader ",")
@@ -249,7 +250,6 @@
   :ensure t
   :after evil-leader
   :init
-  (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-move-beyond-eol t)
   (setq evil-cross-lines t)
