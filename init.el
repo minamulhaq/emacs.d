@@ -250,6 +250,7 @@
           "b" 'ibuffer
           "x" 'helm-M-x
           "p" 'helm-projectile
+          "g" 'magit-status
         )
         )
       )
