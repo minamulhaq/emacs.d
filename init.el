@@ -1,4 +1,14 @@
 
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+
 
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -28,16 +38,6 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 
-;; Garbage Collector
-; (setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
-; (defvar startup/file-name-handler-alist file-name-handler-alist)
-; (setq file-name-handler-alist nil)
-; (defun startup/revert-file-name-handler-alist ()
-;   (setq file-name-handler-alist startup/file-name-handler-alist))
-; (defun startup/reset-gc ()
-;   (setq gc-cons-threshold 16777216 gc-cons-percentage 0.1))
-; (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
-; (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
 
 ; Load Theme GruvBox
@@ -63,11 +63,15 @@
   ;; Cosmetics
 (tool-bar-mode -1)
 
-;;(menu-bar-mode -1)
+(menu-bar-mode -1)
 (scroll-bar-mode -1)
 (blink-cursor-mode -1)
 
-(setq display-line-numbers-type 'relative)
+
+(setq-default
+ display-line-numbers-type 'relative
+ display-line-numbers-current-absolute t
+ display-line-numbers-widen t)
 (global-display-line-numbers-mode t)
 (column-number-mode 1)
 
@@ -121,6 +125,16 @@
 ; (use-package eterm-256color
 ; 			 :hook (term-mode . eterm-256color-mode))
 
+(require 'elisp-slime-nav)
+(defun my-lisp-hook ()
+  (elisp-slime-nav-mode)
+  (turn-on-eldoc-mode)
+    )
+(add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
+
+
+
+
 
 ;; Doom Mode Line
 (use-package doom-modeline
@@ -129,23 +143,23 @@
 
 
 (use-package mode-icons
-			 :ensure t
-			 :init (mode-icons-mode)
-             :config
-             (progn
-               (setq doom-modeline-height 10)
-               (setq doom-modeline-project-detection 'projectile)
-               (setq doom-modeline-buffer-file-name-style 'file-name)
-               (setq doom-modeline-icon (display-graphic-p))
-               (setq doom-modeline-major-mode-icon t)
-               (setq doom-modeline-major-mode-color-icon t)
-               (setq doom-modeline-buffer-state-icon t)
-               (setq doom-modeline-buffer-modification-icon t)
-               (setq doom-modeline-indent-info nil)
-               (setq doom-modeline-modal-icon 'evil)
-               (setq doom-modeline-env-version t)
-                )
-               )
+  :ensure t
+  :init (mode-icons-mode)
+  :config
+  (progn
+    (setq doom-modeline-height 10)
+    (setq doom-modeline-project-detection 'projectile)
+    (setq doom-modeline-buffer-file-name-style 'file-name)
+    (setq doom-modeline-icon (display-graphic-p))
+    (setq doom-modeline-major-mode-icon t)
+    (setq doom-modeline-major-mode-color-icon t)
+    (setq doom-modeline-buffer-state-icon t)
+    (setq doom-modeline-buffer-modification-icon t)
+    (setq doom-modeline-indent-info nil)
+    (setq doom-modeline-modal-icon 'evil)
+    (setq doom-modeline-env-version t)
+    )
+)
 
 ; (use-package nlinum-hl
 ; 			 :ensure t)
@@ -189,6 +203,34 @@
     (package-install 'evil))
 
 
+(use-package evil-leader
+      :ensure t
+      :commands (evil-leader-mode)
+      :init
+		(global-evil-leader-mode)
+      :config
+      (progn
+		(evil-leader/set-leader ",")
+		(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+		(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+		(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+		(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+
+		(evil-leader/set-key
+          "w" 'save-buffer
+          "k" 'kill-buffer-and-window
+          "h" 'dired-jump
+          "v" 'split-window-right
+          "f" 'find-file
+          "e" 'pp-eval-last-sexp
+          "," 'other-window
+          "b" 'ibuffer
+          "x" 'helm-M-x
+          "p" 'helm-projectile
+        )
+        )
+      )
+
 (defun inam/evil-hook ()
   (dolist (mode '(custom-mode
                   eshell-mode
@@ -204,54 +246,31 @@
 
 ; Enable Evil
 (use-package evil
-			 :ensure t
-			 :init
-			 (setq evil-want-keybinding nil)
-             (setq evil-want-C-u-scroll t)
-             (setq evil-move-beyond-eol t)
-             (setq evil-cross-lines t)
-             (setq evil-undo-system 'undo-tree)
-             (setq evil-respect-visual-line-mode t)
-			 (evil-mode 1)
-			 :config
-			 (progn
-			   (add-hook 'evil-mode-hook 'inam/evil-hook)
-			   (evil-set-initial-state 'messages-buffer-mode 'normal)
-			   (evil-set-initial-state 'dashboard-mode 'normal)
-			   (when evil-want-C-u-scroll
-                 (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
-				 (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-				 (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
-				 (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up))
-
-			   )
-			  )
+  :ensure t
+  :after evil-leader
+  :init
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-move-beyond-eol t)
+  (setq evil-cross-lines t)
+  (setq evil-undo-system 'undo-tree)
+  (setq evil-respect-visual-line-mode t)
+  (evil-mode 1)
+  :config
+  (progn
+    (add-hook 'evil-mode-hook 'inam/evil-hook)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal)
+    (when evil-want-C-u-scroll
+      (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
+      (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+      (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+      (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up))
+    )
+  )
 
 
 	  
-(use-package evil-leader
-      :ensure t
-      :commands (evil-leader-mode)
-      :init
-		(global-evil-leader-mode)
-      :config
-      (progn
-		(evil-leader/set-leader ",")
-		(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-		(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-		(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-		(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-
-		(evil-leader/set-key "w" 'save-buffer)
-		(evil-leader/set-key "q" 'kill-buffer-and-window)
-		(evil-leader/set-key "h" 'dired-jump)
-		(evil-leader/set-key "v" 'split-window-right)
-		(evil-leader/set-key "e" 'pp-eval-last-sexp)
-		(evil-leader/set-key "," 'other-window)
-		(evil-leader/set-key "b" 'ibuffer)
-		(evil-leader/set-key "x" 'helm-M-x)
-
-			))        ;; bindings from earlier
 
 
 (use-package evil-collection
@@ -260,14 +279,11 @@
 			 (evil-collection-init))
 
 
-(use-package evil-surround
-  :ensure t
-  :config
-    (global-evil-surround-mode 1))
-
 
 (use-package undo-tree
   :init
+  :after evil
+  
   (global-undo-tree-mode)
   )
 
@@ -937,18 +953,6 @@
 
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages
-   (quote
-    (evil-surround undo-tree rainbow-delimiters evil-collection vterm-toggle lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
-
-
-
 (defun toggle-term ()
   "Toggles between terminal and current buffer (creates terminal, if none exists)"
   (interactive)
@@ -962,4 +966,15 @@
 (global-set-key (kbd "<f12>") 'toggle-term)
 
 
+(electric-pair-mode 1)
+(setq electric-pair-preserve-balance nil)
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(package-selected-packages
+   (quote
+    (elisp-slime-nav jedi lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
