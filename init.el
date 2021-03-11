@@ -59,6 +59,8 @@
 
 
 
+(electric-pair-mode t)
+(setq electric-pair-preserve-balance nil)
 
 ; Load Theme GruvBox
 (load-theme 'gruvbox t)
@@ -238,7 +240,7 @@
 		(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
 
 		(evil-leader/set-key
-          "w" 'save-buffer
+          "s" 'save-buffer
           "k" 'kill-buffer-and-window
           "h" 'dired-jump
           "v" 'split-window-right
@@ -987,15 +989,3 @@
 (global-set-key (kbd "<f12>") 'toggle-term)
 
 
-(electric-pair-mode 1)
-(setq electric-pair-preserve-balance nil)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages
-   (quote
-    (elisp-slime-nav jedi lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode))))
