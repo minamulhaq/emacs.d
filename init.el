@@ -1,5 +1,3 @@
-
-;; Profile emacs startup
 (add-hook 'emacs-startup-hook
           (lambda ()
             (message "*** Emacs loaded in %s with %d garbage collections."
@@ -7,6 +5,28 @@
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
+
+
+
+(setq gc-cons-threshold-original gc-cons-threshold)
+(setq gc-cons-threshold (* 2048 2048 2048))
+
+
+(setq file-name-handler-alist-original file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+(run-with-idle-timer
+ 5 nil
+ (lambda ()
+   (setq gc-cons-threshold gc-cons-threshold-original)
+   (setq file-name-handler-alist file-name-handler-alist-original)
+   (makunbound 'gc-cons-threshold-original)
+   (makunbound 'file-name-handler-alist-original)
+      (message "gc-cons-threshold and file-name-handler-alist restored")))
+
+
+
+
 
 
 
@@ -255,6 +275,7 @@
   (setq evil-cross-lines t)
   (setq evil-undo-system 'undo-tree)
   (setq evil-respect-visual-line-mode t)
+  (global-undo-tree-mode)
   (evil-mode 1)
   :config
   (progn
@@ -929,7 +950,7 @@
    (use-package yasnippet-snippets
        :ensure t
        :pin melpa)
-
+   :init
    (yas-reload-all))
 
 
