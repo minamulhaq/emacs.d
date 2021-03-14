@@ -83,10 +83,10 @@
 
 
   ;; Cosmetics
-(tool-bar-mode -1)
+;(tool-bar-mode -2)
 
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+; (menu-bar-mode -1)
+; (scroll-bar-mode -1)
 (blink-cursor-mode -1)
 
 
@@ -289,9 +289,10 @@
       (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
       (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
       (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
-      (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up))
+      (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
+	;  (define-key evil-insert-state-map (kbd-"TAB") 'tab-to-tab-stop)
     )
-  )
+  ))
 
 
 	  
@@ -844,8 +845,6 @@
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
 
 (setq gc-cons-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024)
@@ -865,20 +864,17 @@
              :init (global-flycheck-mode))
 
 
-(setq sp-ui-sideline-show-diagnostics 0)
+(setq lsp-ui-sideline-show-diagnostics 0)
 ;(setq lsp-ui-sideline-show-hover 1)
 (setq lsp-ui-sideline-show-code-actions 1)
 (setq lsp-ui-sideline-update-mode 1)
 (setq lsp-ui-sideline-delay 0)
 
+
 (setq lsp-ui-peek-enable 1)
 (setq sp-ui-peek-jump-backward 1)
 (setq lsp-ui-peek-jump-forward 1)
 
-
-(setq c-basic-offset 4)
-(setq c-default-style "linux")
-(setq-default indent-tabs-mode nil)
 
 
 ;; Tell cc-mode not to check for old-style (K&R) function declarations.
@@ -893,8 +889,20 @@
 ;; strange way the cc-mode initializes the value of `c-basic-offset'.
 (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4)))
 (add-hook 'c++-mode-hook (lambda () (setq c-basic-offset 4)))
+(add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
 
-;(add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
+
+
+;C/C++ Indentation is tabs
+(add-hook 'c-mode-hook
+          (lambda ()
+            (setq-default indent-tabs-mode t)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq-default indent-tabs-mode t)))
+
+
 
 
 (add-hook 'c-mode-hook (lambda () (show-paren-mode 1)))
@@ -904,6 +912,41 @@
 (add-hook 'c-mode-hook 'projectile-mode)
 (add-hook 'cc-mode-hook 'projectile-mode)
 (add-hook 'c++-mode-hook 'projectile-mode)
+
+
+(setq custom-tab-width 4)
+
+;; Two callable functions for enabling/disabling tabs in Emacs
+(defun disable-tabs () (setq indent-tabs-mode nil))
+(defun enable-tabs  ()
+  (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+  (setq indent-tabs-mode t)
+  (setq tab-width custom-tab-width))
+
+;; Hooks to Enable Tabs
+(add-hook 'prog-mode-hook 'enable-tabs)
+;; Hooks to Disable Tabs
+(add-hook 'lisp-mode-hook 'disable-tabs)
+(add-hook 'emacs-lisp-mode-hook 'disable-tabs)
+
+;(setq-default electric-indent-inhibit t)
+
+
+(add-hook 'c-mode-hook
+		  (lambda ()
+			(setq c-default-style "gnu")
+			))
+
+(add-hook 'c++-mode-hook
+		  (lambda ()
+			(setq c-default-style "gnu")
+			))
+
+
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c-mode-hook 'enable-tabs)
+(add-hook 'c++-mode-hook 'enable-tabs)
+(add-hook 'c++-mode-hook 'lsp)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -937,7 +980,12 @@
 
 
 
-
+; (use-package aggressive-indent
+;   :ensure t
+;   :init
+;   (setq aggressive-indent-comments-too t)
+;   :config
+;   (global-aggressive-indent-mode 1))
 
 
 
@@ -990,3 +1038,79 @@
 (global-set-key (kbd "<f12>") 'toggle-term)
 
 
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GDB ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq
+  ;; use gdb-many-windows by default
+  gdb-many-windows t
+  ;; ?
+  gdb-use-separate-io-buffer t
+  ;; Non-nil means display source file containing the main routine at startup
+  gdb-show-main t
+ )
+
+;; Toggle window dedication
+(defun tedi:toggle-window-dedicated ()
+  "Toggle whether the current active window is dedicated or not"
+  (interactive)
+  (message
+   (if (let (window (get-buffer-window (current-buffer)))
+         (set-window-dedicated-p window
+                                 (not (window-dedicated-p window))))
+       "Window '%s' is dedicated"
+     "Window '%s' is normal")
+   (current-buffer)))
+
+;; Sets up the windows to make the command window dedicated
+(advice-add 'gdb-setup-windows :after
+            (lambda () (set-window-dedicated-p (selected-window) t)))
+
+;; Prevent gdb from popping i/o window to the foreground on every output op
+(setq-default gdb-display-io-nopopup t)
+
+
+(defconst gud-window-register 123456)
+
+(defun gud-quit ()
+  (interactive)
+  (gud-basic-call "quit"))
+
+(add-hook 'gud-mode-hook
+          (lambda ()
+            (gud-tooltip-mode)
+            (window-configuration-to-register gud-window-register)
+            (local-set-key (kbd "C-c q") 'gud-quit)))
+
+(advice-add 'gud-sentinel :after
+            (lambda (proc msg)
+              (when (memq (process-status proc) '(signal exit))
+                (jump-to-register gud-window-register)
+                (bury-buffer))))
+
+
+
+
+
+
+
+
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(package-selected-packages
+   '(aggressive-indent lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
