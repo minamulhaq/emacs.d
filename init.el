@@ -58,54 +58,31 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 
+(use-package org
+  :ensure t)
+(org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+(org-babel-load-file (expand-file-name "~/.emacs.d/myEvil.org"))
+(org-babel-load-file (expand-file-name "~/.emacs.d/myProgModes.org"))
 
-(electric-pair-mode t)
-(setq electric-pair-preserve-balance nil)
+(require 'org-tempo)
 
-; Load Theme GruvBox
-(load-theme 'gruvbox t)
-
-
-; Clear Startup Screen Messages
-
-(setq inhibit-splash-screen t)
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
-
-
-; User Name
-(setq user-full-name "Muhammad Inam Ul Haq")
+(add-to-list 'org-structure-template-alist
+                          '("el" . "src emacs-lisp"))
+                          ;; '("el" "#+BEGIN_SRC emacs-lisp \n\n#+END_SRC"))
 
 
 
-;; esc cancels everything.
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 
-  ;; Cosmetics
-;(tool-bar-mode -2)
-
-; (menu-bar-mode -1)
-; (scroll-bar-mode -1)
-(blink-cursor-mode -1)
 
 
-(setq-default
- display-line-numbers-type 'relative
- display-line-numbers-current-absolute t
- display-line-numbers-widen t)
-(global-display-line-numbers-mode t)
-(column-number-mode 1)
-
-; Disable line numbers for some modes 
-(dolist (mode '(org-mode-hook
-				 term-mode-hook
-				 shell-mode-hook
-				 eshell-mode-hook))
-  (add-hook mode (lambda() (display-line-numbers-mode 0))))
 
 
-(show-paren-mode 1)
+
+
+
+
+
 
 (setq-default tab-width 4)
 (setq-default scroll-step 1)
@@ -117,19 +94,9 @@
 (setq auto-save-default nil)
 
 
-(use-package rainbow-delimeters
- 			 :hook ( prog-mode . rainbow-delimiters-mode))
-
-(setq ring-bell-function 'ignore)
 
 
-;; Set Encodings
 
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
 
 
 ;; ;; Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
@@ -139,169 +106,31 @@
 ;; 			 (global-pretty-mode t))
 
 
-;; (fset 'yes-or-no-p 'y-or-n-p)
-;; (set-variable 'confirm-kill-emacs 'yes-or-no-p)
-(global-set-key (kbd "<f5>") 'revert-buffer)
-
-
-; (use-package eterm-256color
-; 			 :hook (term-mode . eterm-256color-mode))
-
-(require 'elisp-slime-nav)
-(defun my-lisp-hook ()
-  (elisp-slime-nav-mode)
-  (turn-on-eldoc-mode)
-    )
-(add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
 
 
 
 
+(require 'helm-xref)
+(setq xref-show-xrefs-function 'helm-xref-show-xrefs)
 
-;; Doom Mode Line
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
+(require 'helm)
+(require 'helm-config)
+(require 'helm-grep)
+(helm-projectile-on)
 
-
-(use-package mode-icons
-  :ensure t
-  :init (mode-icons-mode)
-  :config
-  (progn
-    (setq doom-modeline-height 10)
-    (setq doom-modeline-project-detection 'projectile)
-    (setq doom-modeline-buffer-file-name-style 'file-name)
-    (setq doom-modeline-icon (display-graphic-p))
-    (setq doom-modeline-major-mode-icon t)
-    (setq doom-modeline-major-mode-color-icon t)
-    (setq doom-modeline-buffer-state-icon t)
-    (setq doom-modeline-buffer-modification-icon t)
-    (setq doom-modeline-indent-info nil)
-    (setq doom-modeline-modal-icon 'evil)
-    (setq doom-modeline-env-version t)
-    )
-)
-
-; (use-package nlinum-hl
-; 			 :ensure t)
-; (require 'linum)                        ;For its face
-
-;  (use-package nlinum-relative
-; 			  :ensure t
-;               :config
-;  			  (nlinum-relative-setup-evil)
-;               (add-hook 'prog-mode-hook 'nlinum-relative-mode)
-;               (setq nlinu-widen 30)
-;               (setq nlinum-relative-redisplay-delay 0)      ;; delay
-;               (setq nlinum-relative-current-symbol "")      ;; or "" for display current line number
-;               (setq nlinum-relative-offset 0))                 ;; 1 if you want 0, 2, 3...')
-
-(use-package general
-  :config
-  (general-evil-setup t)
-
-  (general-create-definer dw/leader-key-def
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-
-  (general-create-definer dw/ctrl-c-keys
-    :prefix "C-c")
-  )
-
-(dw/leader-key-def 
-  "z" '(hydra-text-scale/body :which-key "scale-text")
-  "s" '(shell)
-  )
+(define-key global-map [remap find-file] #'helm-find-files)
+(define-key global-map [remap execute-extended-command] #'helm-M-x)
+(define-key global-map [remap switch-to-buffer] #'helm-mini)
 
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Download Evil
-(unless (package-installed-p 'evil)
-    (package-install 'evil))
 
 
-(use-package evil-leader
-      :ensure t
-      :commands (evil-leader-mode)
-      :init
-      (setq evil-want-keybinding nil)
-      (global-evil-leader-mode)
-      :config
-      (progn
-		(evil-leader/set-leader ",")
-		(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-		(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-		(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-		(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-
-		(evil-leader/set-key
-          "s" 'save-buffer
-          "k" 'kill-buffer-and-window
-          "h" 'dired-jump
-          "v" 'split-window-right
-          "f" 'find-file
-          "e" 'pp-eval-last-sexp
-          "," 'other-window
-          "b" 'ibuffer
-          "x" 'helm-M-x
-          "p" 'helm-projectile
-          "g" 'magit-status
-        )
-        )
-      )
-
-(defun inam/evil-hook ()
-  (dolist (mode '(custom-mode
-                  eshell-mode
-                  git-rebase-mode
-                  erc-mode
-                  circe-server-mode
-                  circe-chat-mode
-                  circe-query-mode
-                  sauron-mode
-                  term-mode))
-  (add-to-list 'evil-emacs-state-modes mode)))
 
 
-; Enable Evil
-(use-package evil
-  :ensure t
-  :after evil-leader
-  :init
-  (setq evil-want-C-u-scroll t)
-  (setq evil-move-beyond-eol t)
-  (setq evil-cross-lines t)
-  (setq evil-undo-system 'undo-tree)
-  (setq evil-respect-visual-line-mode t)
-  (global-undo-tree-mode)
-  (evil-mode 1)
-  :config
-  (progn
-    (add-hook 'evil-mode-hook 'inam/evil-hook)
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal)
-    (when evil-want-C-u-scroll
-      (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
-      (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-      (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
-      (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
-	;  (define-key evil-insert-state-map (kbd-"TAB") 'tab-to-tab-stop)
-    )
-  ))
 
 
-	  
-
-
-(use-package evil-collection
-			 :after evil
-			 :config
-			 (evil-collection-init))
 
 
 
@@ -811,172 +640,6 @@
 ))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; C  --  C++
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(use-package lsp-mode
-			 :commands (lsp lsp-deffered)
-			 :init
-			 (setq lsp-keymap-prefix "C-c l")
-			 :config 
-			 (lsp-enable-which-key-integration t)
-			 :hook (sh-mode . lsp))
-
-(setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp
-                                               projectile hydra flycheck company avy which-key helm-xref dap-mode))
-
-(when (cl-find-if-not #'package-installed-p package-selected-packages)
-    (package-refresh-contents)
-      (mapc #'package-install package-selected-packages))
-
-;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
-(helm-mode)
-(require 'helm-xref)
-(setq xref-show-xrefs-function 'helm-xref-show-xrefs)
-
-(require 'helm)
-(require 'helm-config)
-(require 'helm-grep)
-(helm-projectile-on)
-
-(define-key global-map [remap find-file] #'helm-find-files)
-(define-key global-map [remap execute-extended-command] #'helm-M-x)
-(define-key global-map [remap switch-to-buffer] #'helm-mini)
-
-
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      lsp-idle-delay 0.1)  ;; clangd is fast
-
-(with-eval-after-load 'lsp-mode
-                      (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-                      (require 'dap-cpptools)
-                      (yas-global-mode))
-
-
-(use-package flycheck
-             :ensure t
-             :init (global-flycheck-mode))
-
-
-(setq lsp-ui-sideline-show-diagnostics 0)
-;(setq lsp-ui-sideline-show-hover 1)
-(setq lsp-ui-sideline-show-code-actions 1)
-(setq lsp-ui-sideline-update-mode 1)
-(setq lsp-ui-sideline-delay 0)
-
-
-(setq lsp-ui-peek-enable 1)
-(setq sp-ui-peek-jump-backward 1)
-(setq lsp-ui-peek-jump-forward 1)
-
-
-
-;; Tell cc-mode not to check for old-style (K&R) function declarations.
-;; This speeds up indenting a lot.
-(setq c-recognize-knr-p nil)
-
-(add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
-
-
-;; Change the indentation amount to 4 spaces instead of 2.
-;; You have to do it in this complicated way because of the
-;; strange way the cc-mode initializes the value of `c-basic-offset'.
-(add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4)))
-(add-hook 'c++-mode-hook (lambda () (setq c-basic-offset 4)))
-(add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
-
-
-
-;C/C++ Indentation is tabs
-(add-hook 'c-mode-hook
-          (lambda ()
-            (setq-default indent-tabs-mode t)))
-
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (setq-default indent-tabs-mode t)))
-
-
-
-
-(add-hook 'c-mode-hook (lambda () (show-paren-mode 1)))
-(add-hook 'cc-mode-hook (lambda () (show-paren-mode 1)))
-(add-hook 'c++-mode-hook (lambda () (show-paren-mode 1)))
-
-(add-hook 'c-mode-hook 'projectile-mode)
-(add-hook 'cc-mode-hook 'projectile-mode)
-(add-hook 'c++-mode-hook 'projectile-mode)
-
-
-(setq custom-tab-width 4)
-
-;; Two callable functions for enabling/disabling tabs in Emacs
-(defun disable-tabs () (setq indent-tabs-mode nil))
-(defun enable-tabs  ()
-  (local-set-key (kbd "TAB") 'tab-to-tab-stop)
-  (setq indent-tabs-mode t)
-  (setq tab-width custom-tab-width))
-
-;; Hooks to Enable Tabs
-(add-hook 'prog-mode-hook 'enable-tabs)
-;; Hooks to Disable Tabs
-(add-hook 'lisp-mode-hook 'disable-tabs)
-(add-hook 'emacs-lisp-mode-hook 'disable-tabs)
-
-;(setq-default electric-indent-inhibit t)
-
-
-(add-hook 'c-mode-hook
-		  (lambda ()
-			(setq c-default-style "gnu")
-			))
-
-(add-hook 'c++-mode-hook
-		  (lambda ()
-			(setq c-default-style "gnu")
-			))
-
-
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c-mode-hook 'enable-tabs)
-(add-hook 'c++-mode-hook 'enable-tabs)
-(add-hook 'c++-mode-hook 'lsp)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; PYTHON 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package elpy
-  :ensure t
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable)
-  (setq elpy-rpc-python-command "python3")
-  (setq python-shell-interpreter "python3"
-      python-shell-interpreter-args "-i"))
-
-
-(use-package lsp-jedi
-  :ensure t)
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 
 
@@ -993,16 +656,16 @@
 
 ;Yasnippets
 
-(use-package yasnippet
-   :ensure t
-   :hook (prog-mode . yas-minor-mode)
-   :hook (org-mode . yas-minor-mode)
-   :config
-   (use-package yasnippet-snippets
-       :ensure t
-       :pin melpa)
-   :init
-   (yas-reload-all))
+; (use-package yasnippet
+;    :ensure t
+;    :hook (prog-mode . yas-minor-mode)
+;    :hook (org-mode . yas-minor-mode)
+;    :config
+;  (use-package yasnippet-snippets
+;        :ensure t
+;        :pin melpa)
+;    :init
+;    (yas-reload-all))
 
 
 ;Mark-down mode and enable auto-correction
@@ -1100,17 +763,34 @@
 
 
 
+(defun my-asm-mode-hook ()
+  ;; you can use `comment-dwim' (M-;) for this kind of behaviour anyway
+  (local-unset-key (vector asm-comment-char))
+  ;; (local-unset-key "<return>") ; doesn't work. "RET" in a terminal.  http://emacs.stackexchange.com/questions/13286/how-can-i-stop-the-enter-key-from-triggering-a-completion-in-company-mode
+  (electric-indent-local-mode)  ; toggle off
+;  (setq tab-width 4)
+  (setq indent-tabs-mode nil)
+  ;; asm-mode sets it locally to nil, to "stay closer to the old TAB behaviour".
+  ;; (setq tab-always-indent (default-value 'tab-always-indent))
+
+  (defun asm-calculate-indentation ()
+  (or
+   ;; Flush labels to the left margin.
+;   (and (looking-at "\\(\\.\\|\\sw\\|\\s_\\)+:") 0)
+   (and (looking-at "[.@_[:word:]]+:") 0)
+   ;; Same thing for `;;;' comments.
+   (and (looking-at "\\s<\\s<\\s<") 0)
+   ;; %if nasm macro stuff goes to the left margin
+   (and (looking-at "%") 0)
+   (and (looking-at "c?global\\|section\\|default\\|align\\|INIT_..X") 0)
+   ;; Simple `;' comments go to the comment-column
+   ;(and (looking-at "\\s<\\(\\S<\\|\\'\\)") comment-column)
+   ;; The rest goes at column 4
+   (or 4)))
+  )
+
+(add-hook 'asm-mode-hook #'my-asm-mode-hook)
 
 
 
 
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages
-   '(aggressive-indent lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))

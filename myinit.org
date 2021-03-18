@@ -1,20 +1,185 @@
+
 * Load Gruvbox theme
 
  #+BEGIN_SRC emacs-lisp
+
 (load-theme 'gruvbox t)
+
  #+END_SRC
 
 
-(use-package org
-  :ensure t)
-(org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+
+* Electric Pair Mode
+
+  #+begin_src emacs-lisp
+  (electric-pair-mode t)
+  (show-paren-mode 1)
+  (setq electric-pair-preserve-balance nil)
+  #+end_src
+
+** Rainbow Delimeters
+   #+begin_src emacs-lisp
+   (use-package rainbow-delimeters
+ 			 :hook ( prog-mode . rainbow-delimiters-mode))
+   #+end_src
+
+
+* Start Up Tweeks
+Clear Startup Screen Messages
+
+#+begin_src emacs-lisp
+
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
+#+end_src
 
 
 
-(org-babel-do-load-languages
-   'org-babel-load-languages
-    '((lisp . t)))
 
-(add-to-list 'org-structure-template-alist
-                          '("el" "#+BEGIN_SRC emacs-lisp \n\n#+END_SRC"))
-                          
+* User Details
+User Name
+
+#+begin_src emacs-lisp
+(setq user-full-name "Muhammad Inam Ul Haq")
+#+end_src
+
+
+
+* General tweeks
+** Escape Key
+esc cancels everything.
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
+
+#+begin_src emacs-lisp
+;(tool-bar-mode -2)
+; (menu-bar-mode -1)
+(scroll-bar-mode -1)
+(blink-cursor-mode -1)
+#+end_src
+
+
+
+** Line Numbers
+   #+begin_src emacs-lisp
+(setq-default
+ display-line-numbers-type 'relative
+ display-line-numbers-current-absolute t
+ display-line-numbers-widen t)
+(global-display-line-numbers-mode t)
+(column-number-mode 1)
+   #+end_src
+
+** Disable line numbers for some modes 
+   #+begin_src emacs-lisp
+   (dolist (mode '(org-mode-hook
+				 term-mode-hook
+				 shell-mode-hook
+				 eshell-mode-hook))
+  (add-hook mode (lambda() (display-line-numbers-mode 0))))
+   #+end_src
+
+
+
+
+** No Ring Bells
+
+   #+begin_src emacs-lisp
+   (setq ring-bell-function 'ignore)
+   #+end_src
+
+
+
+
+** Set Encodings
+   #+begin_src emacs-lisp
+   (setq locale-coding-system 'utf-8)
+   (set-terminal-coding-system 'utf-8)
+   (set-keyboard-coding-system 'utf-8)
+   (set-selection-coding-system 'utf-8)
+   (prefer-coding-system 'utf-8)
+   
+   #+end_src
+   
+
+** Revert Buffer and Killing buffers
+   #+begin_src emacs-lisp
+   ;; (fset 'yes-or-no-p 'y-or-n-p)
+   ;; (set-variable 'confirm-kill-emacs 'yes-or-no-p)
+   (global-set-key (kbd "<f5>") 'revert-buffer)
+   
+
+   #+end_src
+
+   
+
+* DOOM Mode Line
+
+  #+begin_src emacs-lisp
+  
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+
+(use-package mode-icons
+  :ensure t
+  :init (mode-icons-mode)
+  :config
+  (progn
+    (setq doom-modeline-height 10)
+    (setq doom-modeline-project-detection 'projectile)
+    (setq doom-modeline-buffer-file-name-style 'file-name)
+    (setq doom-modeline-icon (display-graphic-p))
+    (setq doom-modeline-major-mode-icon t)
+    (setq doom-modeline-major-mode-color-icon t)
+    (setq doom-modeline-buffer-state-icon t)
+    (setq doom-modeline-buffer-modification-icon t)
+    (setq doom-modeline-indent-info nil)
+    (setq doom-modeline-modal-icon 'evil)
+    (setq doom-modeline-env-version t)
+    )
+)
+  #+end_src
+
+
+* Hydra
+
+* General
+
+  #+begin_src emacs-lisp
+(use-package general
+  :config
+  (general-evil-setup t)
+
+  (general-create-definer dw/leader-key-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (general-create-definer dw/ctrl-c-keys
+    :prefix "C-c")
+  )
+   (dw/leader-key-def 			;
+   "z" '(hydra-text-scale/body :which-key "scale-text")
+   "s" '(shell)
+   )
+  #+end_src
+  
+* Slime Nav
+
+  #+begin_src emacs-lisp
+  (require 'elisp-slime-nav)
+  (defun my-lisp-hook ()
+  (elisp-slime-nav-mode)
+  (turn-on-eldoc-mode)
+    )
+  (add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
+
+  
+  #+end_src>
+  
+
+
