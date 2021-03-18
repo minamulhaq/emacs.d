@@ -15,6 +15,9 @@
 
 * C/C++ 
 
+
+** LSP MODE
+
 #+begin_src emacs-lisp
 (use-package lsp-mode
 		       :commands (lsp lsp-deffered)
@@ -37,8 +40,11 @@
                       (yas-global-mode))
   (add-hook 'c-mode-hook 'lsp)
   (add-hook 'c++-mode-hook 'lsp)
-  
+  #+end_src
 
+
+#+begin_src emacs-lisp
+  
 
 (setq gc-cons-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024)
@@ -46,11 +52,18 @@
       company-idle-delay 0.0
       company-minimum-prefix-length 1
       lsp-idle-delay 0.1)  ;; clangd is fast
+#+end_src
+      
+** FlyCheck
 
+#+begin_src emacs-lisp
 (use-package flycheck
              :ensure t
              :init (global-flycheck-mode))
+#+end_src
+** LSP UI
 
+#+begin_src emacs-lisp
 (setq lsp-ui-sideline-show-diagnostics 0)
 ;(setq lsp-ui-sideline-show-hover 1)
 (setq lsp-ui-sideline-show-code-actions 1)
@@ -60,16 +73,49 @@
 (setq sp-ui-peek-jump-backward 1)
 (setq lsp-ui-peek-jump-forward 1)
 
-(setq c-recognize-knr-p nil)
+#+end_src
 
+
+
+** Detect Old Patterns
+#+begin_src emacs-lisp
+
+(setq c-recognize-knr-p nil)
+#+end_src
+
+
+
+** Add custom files to ELISP
+
+#+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
+#+end_src
+
+
+
+** Basic Offsets
+
+#+begin_src emacs-lisp
 
 (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4)))
 (add-hook 'c++-mode-hook (lambda () (setq c-basic-offset 4)))
 (add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
+#+end_src
 
 
 
+
+** Indentation
+
+#+begin_src emacs-lisp
+
+
+(defun disable-tabs () (setq indent-tabs-mode nil))
+(defun enable-tabs  ()
+(local-set-key (kbd "TAB") 'tab-to-tab-stop)
+(setq indent-tabs-mode t)
+(setq tab-width 4))
+(setq-default electric-indent-inhibit t)
 
 (add-hook 'c-mode-hook
           (lambda ()
@@ -78,21 +124,31 @@
 (add-hook 'c++-mode-hook
           (lambda ()
             (setq-default indent-tabs-mode t)))
+#+end_src
+
+** Paren-Mode
+
+#+begin_src emacs-lisp
 
 (add-hook 'c-mode-hook (lambda () (show-paren-mode 1)))
 (add-hook 'cc-mode-hook (lambda () (show-paren-mode 1)))
 (add-hook 'c++-mode-hook (lambda () (show-paren-mode 1)))
+#+end_src
+
+** Enable Projectile Mode
+
+#+begin_src emacs-lisp
 
 (add-hook 'c-mode-hook 'projectile-mode)
 (add-hook 'cc-mode-hook 'projectile-mode)
 (add-hook 'c++-mode-hook 'projectile-mode)
 
-(defun disable-tabs () (setq indent-tabs-mode nil))
-(defun enable-tabs  ()
-(local-set-key (kbd "TAB") 'tab-to-tab-stop)
-(setq indent-tabs-mode t)
-(setq tab-width 4))
-(setq-default electric-indent-inhibit t)
+#+end_src
+
+** Default Coding Style
+
+#+begin_src emacs-lisp
+
 
 (add-hook 'c-mode-hook
 	       (lambda ()
@@ -103,7 +159,14 @@
 	       (lambda ()
 		     (setq c-default-style "gnu")
 		     ))
+ #+end_src
 
+ 
+
+* Python
+** Elpy
+
+ #+begin_src emacs-lisp
 (use-package elpy
 :ensure t
 :defer t
@@ -112,6 +175,10 @@
 (setq elpy-rpc-python-command "python3")
 (setq python-shell-interpreter "python3"
     python-shell-interpreter-args "-i"))
+#+end_src
+    
+** LSP-Jedi
+#+begin_src emacs-lisp
 
 (use-package lsp-jedi
 :ensure t)
