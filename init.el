@@ -68,150 +68,6 @@
 
 (add-to-list 'org-structure-template-alist
                           '("el" . "src emacs-lisp"))
-                          ;; '("el" "#+BEGIN_SRC emacs-lisp \n\n#+END_SRC"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(setq-default tab-width 4)
-(setq-default scroll-step 1)
-(setq-default indent-tabs-mode nil)
-(setq-default whitespace-style '(face lines-tail empty trailing))
-(global-whitespace-mode 1)
-(xterm-mouse-mode 1)
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-
-
-
-
-
-
-
-;; ;; Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
-;; (use-package pretty-mode
-;; 			 :ensure t
-;; 			 :config
-;; 			 (global-pretty-mode t))
-
-
-
-
-
-
-(require 'helm-xref)
-(setq xref-show-xrefs-function 'helm-xref-show-xrefs)
-
-(require 'helm)
-(require 'helm-config)
-(require 'helm-grep)
-(helm-projectile-on)
-
-(define-key global-map [remap find-file] #'helm-find-files)
-(define-key global-map [remap execute-extended-command] #'helm-M-x)
-(define-key global-map [remap switch-to-buffer] #'helm-mini)
-
-
-
-
-
-
-
-
-
-
-
-
-
-(use-package undo-tree
-  :init
-  :after evil
-  
-  (global-undo-tree-mode)
-  )
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; SET HYDRA FOR ZOOM IN ZOOM OUT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package hydra)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; TO DO ;; Configure projectile with Evil
-
-(use-package projectile
-  :ensure t
-  ;;:delight '(:eval (concat " " (projectile-project-name)))
-  :diminish
-  :config
-  (projectile-mode +1)
-  (define-key projectile-mode-map (kbd "C-c p") #'projectile-command-map)
-  (define-key projectile-mode-map (kbd "s-p") #'projectile-find-file) ; counsel
-  (define-key projectile-mode-map (kbd "s-F") #'projectile-ripgrep) ; counsel
-  (setq projectile-sort-order 'recentf
-        projectile-indexing-method 'hybrid
-		;projectile-completion-system 'helm)
-        projectile-completion-system 'ivy))
-
-
-
-
-; (use-package company
-;   :ensure t
-;   :init
-;   (global-company-mode)
-;   :bind (("<backtab>" . company-complete-common-or-cycle))
-;   :config
-;   (setq company-dabbrev-other-buffers t
-;         company-dabbrev-code-other-buffers t)
-;   :hook ((text-mode . company-mode)
-;          (prog-mode . company-mode)))
-
-
-
-
-
-
-
-;; Recent Files
-
-(use-package recentf
-  :ensure t
-  :config
-    (progn
-       (recentf-mode 1)
-       (setq recentf-max-menu-items 25)
-       (global-set-key "\C-x\ \C-r" 'recentf-open-files)))
-
-
-
-;; Which Key
-
-(use-package which-key
-      :ensure t
-      :config
-      (which-key-mode))
-
-
-
-(use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
 
 
 
@@ -265,18 +121,37 @@
 
 
 
+(use-package evil-nerd-commenter
+   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+  
 
-;;Swiper / Ivy / Counsel
 
-; Swiper gives us a really efficient incremental search with regular expressions and Ivy / Counsel 
-; replace a lot of ido or helms completion functionality
 
-; [[https://oremacs.com/swiper][reference documentation]]
-; C-M-j (ivy-immediate-done) Exits with the current input instead of the current candidate 
-; (like other commands). This is useful e.g. when you call find-file to create a new file, but 
-; the desired name matches an existing file. In that case, using C-j would select that existing 
-; file, which isn’t what you want - use this command instead.
 
+(setq-default tab-width 4)
+(setq-default scroll-step 1)
+(setq-default indent-tabs-mode nil)
+(setq-default whitespace-style '(face lines-tail empty trailing))
+(global-whitespace-mode 1)
+(xterm-mouse-mode 1)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+
+
+
+
+
+
+;; Ivy Counsel Swiper
+  
+;; Swiper gives us a really efficient incremental search with regular expressions and Ivy / Counsel 
+;; replace a lot of ido or helms completion functionality
+
+;; [[https://oremacs.com/swiper][reference documentation]]
+;; C-M-j (ivy-immediate-done) Exits with the current input instead of the current candidate 
+;; (like other commands). This is useful e.g. when you call find-file to create a new file, but 
+;; the desired name matches an existing file. In that case, using C-j would select that existing 
+;; file, which isn’t what you want - use this command instead.
 
 (use-package flx
   :ensure t)
@@ -390,6 +265,7 @@
   ;(setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   )
 
+  
 
 
 
