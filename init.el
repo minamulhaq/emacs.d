@@ -60,9 +60,7 @@
 
 (use-package org
   :ensure t)
-(org-babel-load-file (expand-file-name "~/.emacs.d/configurations/myinit.org"))
-(org-babel-load-file (expand-file-name "~/.emacs.d/configurations/myEvil.org"))
-(org-babel-load-file (expand-file-name "~/.emacs.d/configurations/myProgModes.org"))
+(org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
 
 (require 'org-tempo)
 
