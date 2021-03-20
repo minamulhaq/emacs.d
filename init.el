@@ -62,65 +62,10 @@
   :ensure t)
 (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
 
-(require 'org-tempo)
-
-(add-to-list 'org-structure-template-alist
-                          '("el" . "src emacs-lisp"))
-
-
-
-(use-package org-bullets
-  :ensure t
-  :hook ((org-mode . org-bullets-mode)
-         (org-mode . flyspell-mode)
-         (org-mode . linum-mode)
-         (org-mode . show-paren-mode))
-  :config
-  (progn
-
-;;; add autocompletion
-(defun org-easy-template--completion-table (str pred action)
-  (pcase action
-		 (`nil (try-completion  str org-structure-template-alist pred))
-		 (`t   (all-completions str org-structure-template-alist pred))))
-
-(defun org-easy-template--annotation-function (s)
-  (format " -> %s" (cadr (assoc s org-structure-template-alist))))
-
-(defun org-easy-template-completion-function ()
-  (when (looking-back "^[ \t]*<\\([^ \t]*\\)" (point-at-bol))
-	(list
-	  (match-beginning 1) (point)
-      'org-easy-template--completion-table
-      :annotation-function 'org-easy-template--annotation-function
-      :exclusive 'no)))
-
-(defun add-easy-templates-to-capf ()
-  (add-hook 'completion-at-point-functions
-			'org-easy-template-completion-function nil t))
-
-(add-hook 'org-mode-hook #'add-easy-templates-to-capf)
-;; configure the calendar
-
-(setq calendar-week-start-day 1)
-(setq calendar-intermonth-text
-	  '(propertize
-		 (format "%2d"
-				 (car
-				   (calendar-iso-from-absolute
-					 (calendar-absolute-from-gregorian (list month day year)))))
-		 'font-lock-face 'font-lock-warning-face))
-
-
-(setq calendar-intermonth-header
-	  (propertize "Wk"                  ; or e.g. "KW" in Germany
-				  'font-lock-face 'font-lock-keyword-face))))
 
 
 
 
-(use-package evil-nerd-commenter
-   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
   
 
 
