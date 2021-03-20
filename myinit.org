@@ -1,4 +1,21 @@
 
+* Load Gruvbox theme
+
+ #+BEGIN_SRC emacs-lisp
+
+(load-theme 'gruvbox t)
+
+ #+END_SRC
+
+* User Details
+User Name
+
+#+begin_src emacs-lisp
+(setq user-full-name "Muhammad Inam Ul Haq")
+#+end_src
+
+
+
 * Evil
 ** Download Evil
   #+begin_src emacs-lisp
@@ -120,14 +137,6 @@
    
    #+end_src
 
-* Load Gruvbox theme
-
- #+BEGIN_SRC emacs-lisp
-
-(load-theme 'gruvbox t)
-
- #+END_SRC
-
 * Electric Pair Mode
 
   #+begin_src emacs-lisp
@@ -156,62 +165,40 @@ Clear Startup Screen Messages
 
 
 
-* User Details
-User Name
-
-#+begin_src emacs-lisp
-(setq user-full-name "Muhammad Inam Ul Haq")
-#+end_src
-
-
-
-* Movement 
-** Move Line up down
-  #+begin_src emacs-lisp
-    (defun tedi:move-line-up ()
-      "Move up the current line."
-      (interactive)
-      (transpose-lines 1)
-      (forward-line -2)
-      (indent-according-to-mode))
-
-    (defun tedi:move-line-down ()
-      "Move down the current line."
-      (interactive)
-      (forward-line 1)
-      (transpose-lines 1)
-      (forward-line -1)
-      (indent-according-to-mode))
-
-    (global-set-key [(meta up)]   'tedi:move-line-up)
-    (global-set-key [(meta down)] 'tedi:move-line-down)
-  #+end_src
-  
-** Go To Line
-   #+begin_src emacs-lisp
-    (global-set-key (kbd "M-g") 'goto-line)
-   #+end_src
-
-
-  
 * General tweeks
  
+  
+** No backup files and No saved files
+   #+begin_src emacs-lisp
+     (setq make-backup-files nil)            
+     (setq auto-save-default nil)
+   #+end_src
+** Mouse and Scroll
+   #+begin_src emacs-lisp
+     (setq-default scroll-step 1)            
+     (xterm-mouse-mode 1)
+   #+end_src
+** Tabs
+   #+begin_src emacs-lisp
+     (setq-default tab-width 4)              
+     (setq-default indent-tabs-mode nil)
+   #+end_src
 ** White Space
+Visualize tabs as a pipe character - "|"
+custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
+Your init file should contain only one such instance. If there is more than one, they won't work right.
    #+begin_src emacs-lisp
      (require 'whitespace)
 
      (setq whitespace-style '(face empty tabs tab-mark lines-tail trailing))
 
-     ;;Visualize tabs as a pipe character - "|"
      (custom-set-faces
-      ;; custom-set-faces was added by Custom.
-      ;; If you edit it by hand, you could mess it up, so be careful.
-      ;; Your init file should contain only one such instance.
-      ;; If there is more than one, they won't work right.
       '(whitespace-tab ((t (:foreground "#636363")))))
      (setq whitespace-display-mappings '((tab-mark 9 [124 9] [92 9]))) ; 124 is the ascii ID for '\|'
 
      (global-whitespace-mode t)
+;; (setq-default whitespace-style '(face lines-tail empty trailing))
+;; (global-whitespace-mode 1)
    
    #+end_src
 ** Escape Key
@@ -300,6 +287,53 @@ not start with an asterisk
     (global-set-key (kbd "C-x k") 'kill-this-buffer)
    #+end_src
 
+** Toggle Terminal
+   #+begin_src emacs-lisp
+     (defun toggle-term ()                   
+       "Toggles between terminal and current buffer (creates terminal, if none exists)"
+       (interactive)
+       (if (string= (buffer-name) "*ansi-term*")
+           (switch-to-buffer (other-buffer (current-buffer)))
+         (if (get-buffer "*ansi-term*")
+             (switch-to-buffer "*ansi-term*")
+           (progn
+             (ansi-term (getenv "SHELL"))
+             (setq show-trailing-whitespace nil)))))
+     (global-set-key (kbd "<f12>") 'toggle-term)
+  
+   #+end_src
+* General
+  
+  #+begin_src emacs-lisp
+(use-package general
+  :config
+  (general-evil-setup t)
+
+  (general-create-definer dw/leader-key-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (general-create-definer dw/ctrl-c-keys
+    :prefix "C-c")
+  )
+   (dw/leader-key-def 			;
+   "z" '(hydra-text-scale/body :which-key "scale-text")
+   "s" '(shell)
+   )
+  #+end_src
+  
+* Avy
+Avy - navigate by searching for a letter on the screen and jumping to it
+See https://github.com/abo-abo/avy for more info
+
+  #+begin_src emacs-lisp
+    (use-package avy                        
+    :ensure t
+    :bind ("M-s" . avy-goto-word-1)) ;; changed from char as per jcs
+  
+  #+end_src
+
 * DOOM Mode Line
 
   #+begin_src emacs-lisp
@@ -332,51 +366,29 @@ not start with an asterisk
 
 * Hydra
 
-* General
+* Magit
+ 
 
+** Transient
   #+begin_src emacs-lisp
-(use-package general
-  :config
-  (general-evil-setup t)
-
-  (general-create-definer dw/leader-key-def
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-
-  (general-create-definer dw/ctrl-c-keys
-    :prefix "C-c")
-  )
-   (dw/leader-key-def 			;
-   "z" '(hydra-text-scale/body :which-key "scale-text")
-   "s" '(shell)
-   )
+    (use-package transient                  
+      :ensure t)
   #+end_src
-  
-* Slime Nav
-
-  #+begin_src emacs-lisp
-  (require 'elisp-slime-nav)
-  (defun my-lisp-hook ()
-  (elisp-slime-nav-mode)
-  (turn-on-eldoc-mode)
-    )
-  (add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
-
-  
-  #+end_src>
-  
 
 
+** Magit
+   #+begin_src emacs-lisp
+     (use-package magit                      
+       :ensure t
+       :commands magit-status
+       :bind (("C-x g" . magit-status))
+       :config
+       (use-package git-commit
+         :ensure t)
+     )
+   
+   #+end_src
 
-  
-
-
-  
-
-  
-
-  
 
 * Helm
 
@@ -396,6 +408,219 @@ not start with an asterisk
   #+end_src
   
 
+* Ivy Counsel Swiper
+  
+Swiper gives us a really efficient incremental search with regular expressions and Ivy / Counsel 
+replace a lot of ido or helms completion functionality
+
+[[https://oremacs.com/swiper][reference documentation]]
+C-M-j (ivy-immediate-done) Exits with the current input instead of the current candidate 
+(like other commands). This is useful e.g. when you call find-file to create a new file, but 
+the desired name matches an existing file. In that case, using C-j would select that existing 
+file, which isn’t what you want - use this command instead.
+
+** flx
+#+begin_src emacs-lisp
+  (use-package flx                        
+    :ensure t)
+#+end_src
+
+** Counsel
+   #+begin_src emacs-lisp
+     (use-package counsel                    
+       :ensure t
+       :pin melpa
+       :diminish
+       :hook (ivy-mode . counsel-mode)
+       :config
+       (global-set-key (kbd "s-P") #'counsel-M-x)
+       (global-set-key (kbd "s-f") #'counsel-grep-or-swiper)
+       (setq counsel-rg-base-command "rg --vimgrep %s"))
+   #+end_src
+
+
+** Counsel-projectile
+   #+begin_src emacs-lisp
+ (use-package counsel-projectile
+   :ensure t
+   :pin melpa
+   :config (counsel-projectile-mode +1)
+   :bind (("C-c p SPC" . counsel-projectile))
+   )
+   
+   #+end_src
+   
+
+** Ivy
+   #+begin_src emacs-lisp
+     (use-package ivy                        
+       :ensure t
+       :pin melpa
+       :diminish (ivy-mode)
+       :hook (after-init . ivy-mode)
+       :bind (("C-x b" . ivy-switch-buffer))
+       :config
+       (ivy-mode 1)
+       (setq ivy-display-style nil)
+       (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
+       (define-key ivy-minibuffer-map (kbd "<escape>") #'minibuffer-keyboard-quit)
+       (setq ivy-use-selectable-prompt t)   ;; make prompt line selectagle
+       (setq ivy-re-builders-alist
+             '((counsel-rg . ivy--regex-plus)
+               (counsel-projectile-rg . ivy--regex-plus)
+               (counsel-ag . ivy--regex-plus)
+               (counsel-projectile-ag . ivy--regex-plus)
+               (swiper . ivy--regex-plus)
+               (t . ivy--regex-fuzzy)))
+       (setq ivy-use-virtual-buffers t
+             ivy-count-format "(%d/%d) "
+             ivy-initial-inputs-alist nil
+             ivy-display-style 'fancy)
+             (define-key ivy-minibuffer-map (kbd "C-w") 'ivy-yank-word)
+             )
+   #+end_src
+
+   
+** Swiper
+   #+begin_src emacs-lisp
+     (use-package swiper                     
+       :ensure t
+       :after ivy
+       :diminish
+       ;;  :custom-face (swiper-line-face ((t (:foreground "#ffffff" :background "#60648E"))))
+       :bind (("C-s" . swiper)
+	   ("C-r" . swiper)
+	   ("C-c C-r" . ivy-resume)
+	   ("M-x" . counsel-M-x)
+	   ("C-x C-f" . counsel-find-file))
+       :config
+       (setq swiper-action-recenter t)
+       (setq swiper-goto-start-of-match t)
+       (progn
+       (ivy-mode 1)
+       (setq ivy-use-virtual-buffers t)
+       (setq ivy-display-style 'fancy)
+       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+       ))
+
+
+   #+end_src
+
+
+** Ivy-posframe
+   #+begin_src emacs-lisp
+     (use-package ivy-posframe               
+     :ensure t
+     :pin melpa
+     :after ivy
+     :config
+     (setq ivy-posframe-display-functions-alist
+         '((swiper          . ivy-posframe-display-at-point)
+           (complete-symbol . ivy-posframe-display-at-point)
+           (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+           (t               . ivy-posframe-display))
+           ivy-posframe-height-alist '((t . 20))
+           ivy-posframe-parameters '((internal-border-width . 5)))
+     (setq ivy-posframe-width 120)
+     (ivy-posframe-mode +1))
+
+   #+end_src
+
+
+** Ivy-rich
+   #+begin_src emacs-lisp
+     (use-package ivy-rich                   
+       :ensure t
+       :after (ivy ivy-postframe)
+       :pin melpa
+       :preface
+       (defun ivy-rich-switch-buffer-icon (candidate)
+         (with-current-buffer
+             (get-buffer candidate)
+            (all-the-icons-icon-for-mode major-mode)))
+        :init
+       (setq ivy-rich-display-transformers-list ; max column width sum = (ivy-poframe-width - 1)
+             '(ivy-switch-buffer
+               (:columns
+                ((ivy-rich-switch-buffer-icon (:width 2))
+                 (ivy-rich-candidate (:width 35))
+                 (ivy-rich-switch-buffer-project (:width 15 :face success))
+                 (ivy-rich-switch-buffer-major-mode (:width 13 :face warning)))
+                :predicate
+                #'(lambda (cand) (get-buffer cand)))
+               counsel-M-x
+               (:columns
+                ((counsel-M-x-transformer (:width 35))
+                 (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+               counsel-describe-function
+               (:columns
+                ((counsel-describe-function-transformer (:width 35))
+                 (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+               counsel-describe-variable
+               (:columns
+                ((counsel-describe-variable-transformer (:width 35))
+                 (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+               package-install
+               (:columns
+                ((ivy-rich-candidate (:width 25))
+                 (ivy-rich-package-version (:width 12 :face font-lock-comment-face))
+                 (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+                 (ivy-rich-package-install-summary (:width 23 :face font-lock-doc-face))))))
+       :config
+       (ivy-rich-mode +1)
+       ;(setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+       )
+
+   #+end_src
+
+** Wgrep
+   #+begin_src emacs-lisp
+     (use-package wgrep                      
+       :ensure t
+       :config
+       (setq wgrep-enable-key (kbd "C-c C-w")) ; change to wgrep mode
+       (setq wgrep-auto-save-buffer t))
+
+   #+end_src
+
+
+** Prescient 
+   #+begin_src emacs-lisp
+     (use-package prescient                  
+       :ensure t
+       :config
+       (setq prescient-filter-method '(literal regexp initialism fuzzy))
+       (prescient-persist-mode +1))
+   #+end_src
+
+** Ivy-Prescient
+   #+begin_src emacs-lisp
+     (use-package ivy-prescient
+       :ensure t
+       :after (prescient ivy)
+       :config
+       (setq ivy-prescient-sort-commands
+             '(:not swiper counsel-grep ivy-switch-buffer))
+       (setq ivy-prescient-retain-classic-highlighting t)
+       (ivy-prescient-mode +1))
+   
+   #+end_src
+   
+** Company-prescient
+   #+begin_src emacs-lisp
+     (use-package company-prescient
+       :ensure t
+       :after (prescient company)
+       :config (company-prescient-mode +1))
+   #+end_src
+
+
+
+
+
+
+
+
 * Projectile
 
   #+begin_src emacs-lisp
@@ -414,11 +639,32 @@ not start with an asterisk
         projectile-indexing-method 'hybrid
 		;projectile-completion-system 'helm)
         projectile-completion-system 'ivy))
-
   
   #+end_src
   
+  
+** Helm-Projectile
+   #+begin_src emacs-lisp
+     (projectile-global-mode)                ;
 
+     ;; helm autocompletion mode and integration with projectile
+     (use-package helm-projectile
+       :ensure t
+       :after helm
+       :defer t
+       :config
+       (progn
+          (setq projectile-completion-system 'helm)
+          (helm-projectile-on)
+          (setq projectile-switch-project-action 'helm-projectile)
+          (setq projectile-enable-idle-timer t)
+          (setq projectile-globally-unignored-files (quote ("*.o" "*.pyc" "*~")))
+          (setq projectile-tags-backend (quote find-tag))
+          (setq projectile-enable-caching t)))
+  
+   #+end_src
+  
+  
 * Pretty Mode
 Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
   #+begin_src emacs-lisp
@@ -430,37 +676,79 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
   #+end_src
 
   
-* Recent Files
+* Org 
+
   #+begin_src emacs-lisp
-(use-package recentf
-  :ensure t
-  :config
-    (progn
-       (recentf-mode 1)
-       (setq recentf-max-menu-items 25)
-       (global-set-key "\C-x\ \C-r" 'recentf-open-files)))
+    (require 'org-tempo)                    
+    (add-to-list 'org-structure-template-alist
+                              '("el" . "src emacs-lisp"))
+
+
+    (use-package org-bullets
+      :ensure t
+      :hook ((org-mode . org-bullets-mode)
+             (org-mode . flyspell-mode)
+             (org-mode . linum-mode)
+             (org-mode . show-paren-mode))
+      :config
+      (progn
+
+    ;;; add autocompletion
+    (defun org-easy-template--completion-table (str pred action)
+      (pcase action
+             (`nil (try-completion  str org-structure-template-alist pred))
+             (`t   (all-completions str org-structure-template-alist pred))))
+
+    (defun org-easy-template--annotation-function (s)
+      (format " -> %s" (cadr (assoc s org-structure-template-alist))))
+
+    (defun org-easy-template-completion-function ()
+      (when (looking-back "^[ \t]*<\\([^ \t]*\\)" (point-at-bol))
+        (list
+          (match-beginning 1) (point)
+          'org-easy-template--completion-table
+          :annotation-function 'org-easy-template--annotation-function
+          :exclusive 'no)))
+
+    (defun add-easy-templates-to-capf ()
+      (add-hook 'completion-at-point-functions
+                'org-easy-template-completion-function nil t))
+
+    (add-hook 'org-mode-hook #'add-easy-templates-to-capf)
+    ;; configure the calendar
+
+    (setq calendar-week-start-day 1)
+    (setq calendar-intermonth-text
+          '(propertize
+             (format "%2d"
+                     (car
+                       (calendar-iso-from-absolute
+                         (calendar-absolute-from-gregorian (list month day year)))))
+             'font-lock-face 'font-lock-warning-face))
+
+
+    (setq calendar-intermonth-header
+          (propertize "Wk"                  ; or e.g. "KW" in Germany
+                      'font-lock-face 'font-lock-keyword-face))))
   
   #+end_src
-
-
-
-* Which Key
-
-#+begin_src emacs-lisp
-  (use-package which-key
-        :ensure t
-        :config
-        (which-key-mode))
-  
-#+end_src
-
-
-
   
 
+* PDF Tools
+  #+begin_src emacs-lisp
+    (use-package pdf-tools                 
+      :ensure t
+      :config
+      (pdf-tools-install))
+  #+end_src
 
+** Org-pdftools
+   #+begin_src emacs-lisp
+     (use-package org-pdftools               
+       :ensure t)
+   #+end_src
 
-* General Programming Mode Tweeks
+* Programming Mode Tweeks
 ** Makefile mode  
    #+begin_src emacs-lisp
      (use-package auto-complete              
@@ -727,126 +1015,208 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
   
 
   
-* Org 
+** GDB
+   #+begin_src emacs-lisp
+     (setq                               
+       ;; use gdb-many-windows by default
+       gdb-many-windows t
+       ;; ?
+       gdb-use-separate-io-buffer t
+       ;; Non-nil means display source file containing the main routine at startup
+       gdb-show-main t
+      )
 
-  #+begin_src emacs-lisp
-    (require 'org-tempo)                    
-    (add-to-list 'org-structure-template-alist
-                              '("el" . "src emacs-lisp"))
+     ;; Toggle window dedication
+     (defun tedi:toggle-window-dedicated ()
+       "Toggle whether the current active window is dedicated or not"
+       (interactive)
+       (message
+        (if (let (window (get-buffer-window (current-buffer)))
+              (set-window-dedicated-p window
+                                      (not (window-dedicated-p window))))
+            "Window '%s' is dedicated"
+          "Window '%s' is normal")
+        (current-buffer)))
 
+     ;; Sets up the windows to make the command window dedicated
+     (advice-add 'gdb-setup-windows :after
+                 (lambda () (set-window-dedicated-p (selected-window) t)))
 
-    (use-package org-bullets
-      :ensure t
-      :hook ((org-mode . org-bullets-mode)
-             (org-mode . flyspell-mode)
-             (org-mode . linum-mode)
-             (org-mode . show-paren-mode))
-      :config
-      (progn
-
-    ;;; add autocompletion
-    (defun org-easy-template--completion-table (str pred action)
-      (pcase action
-             (`nil (try-completion  str org-structure-template-alist pred))
-             (`t   (all-completions str org-structure-template-alist pred))))
-
-    (defun org-easy-template--annotation-function (s)
-      (format " -> %s" (cadr (assoc s org-structure-template-alist))))
-
-    (defun org-easy-template-completion-function ()
-      (when (looking-back "^[ \t]*<\\([^ \t]*\\)" (point-at-bol))
-        (list
-          (match-beginning 1) (point)
-          'org-easy-template--completion-table
-          :annotation-function 'org-easy-template--annotation-function
-          :exclusive 'no)))
-
-    (defun add-easy-templates-to-capf ()
-      (add-hook 'completion-at-point-functions
-                'org-easy-template-completion-function nil t))
-
-    (add-hook 'org-mode-hook #'add-easy-templates-to-capf)
-    ;; configure the calendar
-
-    (setq calendar-week-start-day 1)
-    (setq calendar-intermonth-text
-          '(propertize
-             (format "%2d"
-                     (car
-                       (calendar-iso-from-absolute
-                         (calendar-absolute-from-gregorian (list month day year)))))
-             'font-lock-face 'font-lock-warning-face))
+     ;; Prevent gdb from popping i/o window to the foreground on every output op
+     (setq-default gdb-display-io-nopopup t)
 
 
-    (setq calendar-intermonth-header
-          (propertize "Wk"                  ; or e.g. "KW" in Germany
-                      'font-lock-face 'font-lock-keyword-face))))
-  
-  #+end_src
+     (defconst gud-window-register 123456)
+
+     (defun gud-quit ()
+       (interactive)
+       (gud-basic-call "quit"))
+
+     (add-hook 'gud-mode-hook
+               (lambda ()
+                 (gud-tooltip-mode)
+                 (window-configuration-to-register gud-window-register)
+                 (local-set-key (kbd "C-c q") 'gud-quit)))
+
+     (advice-add 'gud-sentinel :after
+                 (lambda (proc msg)
+                   (when (memq (process-status proc) '(signal exit))
+                     (jump-to-register gud-window-register)
+                     (bury-buffer))))
+   #+end_src
+
+
   
 
-* GDB
+** Movement 
+*** Move Line up down
+   #+begin_src emacs-lisp
+     (defun tedi:move-line-up ()
+       "Move up the current line."
+       (interactive)
+       (transpose-lines 1)
+       (forward-line -2)
+       (indent-according-to-mode))
+
+     (defun tedi:move-line-down ()
+       "Move down the current line."
+       (interactive)
+       (forward-line 1)
+       (transpose-lines 1)
+       (forward-line -1)
+       (indent-according-to-mode))
+
+     (global-set-key [(meta up)]   'tedi:move-line-up)
+     (global-set-key [(meta down)] 'tedi:move-line-down)
+   #+end_src
+  
+*** Go To Line
+    #+begin_src emacs-lisp
+     (global-set-key (kbd "M-g") 'goto-line)
+    #+end_src
+
+
+  
+* Recent Files
   #+begin_src emacs-lisp
-    (setq                               
-      ;; use gdb-many-windows by default
-      gdb-many-windows t
-      ;; ?
-      gdb-use-separate-io-buffer t
-      ;; Non-nil means display source file containing the main routine at startup
-      gdb-show-main t
-     )
-
-    ;; Toggle window dedication
-    (defun tedi:toggle-window-dedicated ()
-      "Toggle whether the current active window is dedicated or not"
-      (interactive)
-      (message
-       (if (let (window (get-buffer-window (current-buffer)))
-             (set-window-dedicated-p window
-                                     (not (window-dedicated-p window))))
-           "Window '%s' is dedicated"
-         "Window '%s' is normal")
-       (current-buffer)))
-
-    ;; Sets up the windows to make the command window dedicated
-    (advice-add 'gdb-setup-windows :after
-                (lambda () (set-window-dedicated-p (selected-window) t)))
-
-    ;; Prevent gdb from popping i/o window to the foreground on every output op
-    (setq-default gdb-display-io-nopopup t)
-
-
-    (defconst gud-window-register 123456)
-
-    (defun gud-quit ()
-      (interactive)
-      (gud-basic-call "quit"))
-
-    (add-hook 'gud-mode-hook
-              (lambda ()
-                (gud-tooltip-mode)
-                (window-configuration-to-register gud-window-register)
-                (local-set-key (kbd "C-c q") 'gud-quit)))
-
-    (advice-add 'gud-sentinel :after
-                (lambda (proc msg)
-                  (when (memq (process-status proc) '(signal exit))
-                    (jump-to-register gud-window-register)
-                    (bury-buffer))))
-  #+end_src
-
-* Toggle Terminal
-  #+begin_src emacs-lisp
-    (defun toggle-term ()                   
-      "Toggles between terminal and current buffer (creates terminal, if none exists)"
-      (interactive)
-      (if (string= (buffer-name) "*ansi-term*")
-          (switch-to-buffer (other-buffer (current-buffer)))
-        (if (get-buffer "*ansi-term*")
-            (switch-to-buffer "*ansi-term*")
-          (progn
-            (ansi-term (getenv "SHELL"))
-            (setq show-trailing-whitespace nil)))))
-    (global-set-key (kbd "<f12>") 'toggle-term)
+(use-package recentf
+  :ensure t
+  :config
+    (progn
+       (recentf-mode 1)
+       (setq recentf-max-menu-items 25)
+       (global-set-key "\C-x\ \C-r" 'recentf-open-files)))
   
   #+end_src
+
+
+
+* Slime Nav
+
+  #+begin_src emacs-lisp
+  (require 'elisp-slime-nav)
+  (defun my-lisp-hook ()
+  (elisp-slime-nav-mode)
+  (turn-on-eldoc-mode)
+    )
+  (add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
+
+  
+  #+end_src>
+  
+
+
+
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+* Treemacs
+  #+begin_src emacs-lisp
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (setq treemacs-follow-after-init          t
+          treemacs-width                      35
+          treemacs-indentation                2
+          treemacs-git-integration            t
+          treemacs-collapse-dirs              3
+          treemacs-silent-refresh             nil
+          treemacs-change-root-without-asking nil
+          treemacs-sorting                    'alphabetic-desc
+          treemacs-show-hidden-files          t
+          treemacs-never-persist              nil
+          treemacs-is-never-other-window      nil
+          treemacs-goto-tag-strategy          'refetch-index)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t))
+  :bind
+  (:map global-map
+        ("C-c 0"        . treemacs-toggle)
+        ;([f8]       . treemacs-toggle)
+        ("M-0"       . treemacs-select-window)
+        ("C-c 1"     . treemacs-delete-other-windows)
+        ("M-n ft"    . treemacs-toggle)
+        ("M-n fT"    . treemacs)
+        ("M-n f C-t" . treemacs-find-file)))
+  #+end_src
+
+** Treemacs-projectile
+   #+begin_src emacs-lisp
+     (use-package treemacs-projectile        
+       :after treemacs
+       :defer t
+       :ensure t
+       :config
+       (setq treemacs-header-function #'treemacs-projectile-create-header)
+       :bind (:map global-map
+                   ("M-n fP" . treemacs-projectile)
+                   ("M-n fp" . treemacs-projectile-toggle)))
+   #+end_src
+** Treemacs-magit
+   #+begin_src emacs-lisp
+     (use-package treemacs-magit             
+       :after treemacs magit
+       :defer t
+       :ensure t)
+   #+end_src
+
+
+
+
+
+
+
+
+
+  
+   
+
+* Which Key
+
+#+begin_src emacs-lisp
+  (use-package which-key
+        :ensure t
+        :config
+        (which-key-mode))
+  
+#+end_src
+
+
+
+  
+
+
+
+
