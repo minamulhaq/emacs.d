@@ -188,7 +188,7 @@ Visualize tabs as a pipe character - "|"
 custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
 Your init file should contain only one such instance. If there is more than one, they won't work right.
    #+begin_src emacs-lisp
-     (require 'whitespace)
+   (require 'whitespace)
 
      (setq whitespace-style '(face empty tabs tab-mark lines-tail trailing))
 
@@ -761,16 +761,15 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
    #+end_src
 ** Yasnippets
    #+begin_src emacs-lisp
-     ; (use-package yasnippet
-     ;    :ensure t
-     ;    :hook (prog-mode . yas-minor-mode)
-     ;    :hook (org-mode . yas-minor-mode)
-     ;    :config
-     ;  (use-package yasnippet-snippets
-     ;        :ensure t
-     ;        :pin melpa)
-     ;    :init
-     ;    (yas-reload-all))
+     (use-package yasnippet
+        :ensure t
+        :hook (prog-mode . yas-minor-mode)
+        :hook (org-mode . yas-minor-mode)
+        :config
+      (use-package yasnippet-snippets
+            :ensure t
+            :pin melpa)
+        (yas-reload-all))
    
    #+end_src
 
