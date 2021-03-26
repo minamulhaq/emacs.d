@@ -54,6 +54,7 @@ User Name
           "p" 'helm-projectile
           "g" 'magit-status
           "c" 'counsel-projectile
+          "r" 'projectile-ripgrep
         )
         )
       )
