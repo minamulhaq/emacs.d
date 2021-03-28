@@ -90,6 +90,7 @@ User Name
    (setq evil-cross-lines t)
    (setq evil-undo-system 'undo-tree)
    (setq evil-respect-visual-line-mode t)
+   (setq evil-collection-want-find-usages-bindings t) 
    (global-undo-tree-mode)
    (evil-mode 1)
    :config
@@ -112,11 +113,12 @@ User Name
 ** Evil Collection
 
    #+begin_src emacs-lisp
-   (use-package evil-collection
-			 :after evil
-			 :config
-			 (evil-collection-init))
-   
+         (use-package evil-collection
+                   :after evil
+                   :config
+                   (evil-collection-init)
+      )
+
    #+end_src
 
    
@@ -751,59 +753,6 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
    #+end_src
 
 * Programming Mode Tweeks
-** Makefile mode  
-   #+begin_src emacs-lisp
-     (use-package auto-complete              
-                  :ensure t
-                  :init
-                  (progn
-                    (ac-config-default)
-                    (add-hook 'makefile-gmake-mode-hook 'auto-complete-mode)
-     ))
-   #+end_src
-** Yasnippets
-   #+begin_src emacs-lisp
-     (use-package yasnippet
-        :ensure t
-        :hook (prog-mode . yas-minor-mode)
-        :hook (org-mode . yas-minor-mode)
-        :config
-      (use-package yasnippet-snippets
-            :ensure t
-            :pin melpa)
-        (yas-reload-all))
-   
-   #+end_src
-
-** Tabs
-#+begin_src emacs-lisp
-
-(add-hook 'prog-mode-hook 'enable-tabs)
-
-(add-hook 'lisp-mode-hook 'disable-tabs)
-(add-hook 'emacs-lisp-mode-hook 'disable-tabs)
-#+end_src
-
-
-
-
-** Markdown Mode
-   #+begin_src emacs-lisp
-     (use-package markdown-mode              
-       :ensure  t
-       :defer   t
-       :mode    ("\\.\\(markdown\\|mdown\\|md\\)$" . markdown-mode)
-       :hook  ((markdown-mode . visual-line-mode)
-               (markdown-mode . writegood-mode)
-               (markdown-mode . flyspell-mode))
-       :config
-       (progn
-         (setq markdown-command "pandoc --smart -f markdown -t html")
-       )
-     )
-   
-   #+end_src
-
 ** C/C++ 
 
 
@@ -829,8 +778,6 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
                        (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
                        (require 'dap-cpptools)
                        (yas-global-mode))
-   (add-hook 'c-mode-hook 'lsp)
-   (add-hook 'c++-mode-hook 'lsp)
    #+end_src
 
 
@@ -887,10 +834,9 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
 *** Basic Offsets
 
  #+begin_src emacs-lisp
-
  (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4)))
  (add-hook 'c++-mode-hook (lambda () (setq c-basic-offset 4)))
- (add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
+ ;; (add-hook 'c++-mode-hook (lambda () (highlight-lines-matching-regexp ".\{91\}" "hi-green-b")))
  #+end_src
 
 
@@ -940,6 +886,8 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
 
  #+begin_src emacs-lisp
 
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
 
  (add-hook 'c-mode-hook
 	        (lambda ()
@@ -953,6 +901,59 @@ Enable Pretty Mode. Converts lambda to actual symbols (Package CL is deprecated)
   #+end_src
 
  
+
+** Makefile mode  
+   #+begin_src emacs-lisp
+     (use-package auto-complete              
+                  :ensure t
+                  :init
+                  (progn
+                    (ac-config-default)
+                    (add-hook 'makefile-gmake-mode-hook 'auto-complete-mode)
+     ))
+   #+end_src
+** Yasnippets
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+        :ensure t
+        :hook (prog-mode . yas-minor-mode)
+        :hook (org-mode . yas-minor-mode)
+        :config
+      (use-package yasnippet-snippets
+            :ensure t
+            :pin melpa)
+        (yas-reload-all))
+   
+   #+end_src
+
+** Tabs
+#+begin_src emacs-lisp
+
+(add-hook 'prog-mode-hook 'enable-tabs)
+
+(add-hook 'lisp-mode-hook 'disable-tabs)
+(add-hook 'emacs-lisp-mode-hook 'disable-tabs)
+#+end_src
+
+
+
+
+** Markdown Mode
+   #+begin_src emacs-lisp
+     (use-package markdown-mode              
+       :ensure  t
+       :defer   t
+       :mode    ("\\.\\(markdown\\|mdown\\|md\\)$" . markdown-mode)
+       :hook  ((markdown-mode . visual-line-mode)
+               (markdown-mode . writegood-mode)
+               (markdown-mode . flyspell-mode))
+       :config
+       (progn
+         (setq markdown-command "pandoc --smart -f markdown -t html")
+       )
+     )
+   
+   #+end_src
 
 ** Python
 *** Elpy
